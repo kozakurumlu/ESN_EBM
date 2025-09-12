@@ -1,0 +1,64 @@
+{
+  "chirp": {
+    "overall_rank": [
+      "softsign_pca",
+      "tanh_pca",
+      "lsm_spikes",
+      "lsm_rates",
+      "tanh_raw",
+      "softsign_raw"
+    ],
+    "per_gap_best": [
+      {
+        "gap": 10,
+        "arch": "softsign_pca",
+        "MAE_mean": 0.4412710428237915
+      },
+      {
+        "gap": 20,
+        "arch": "tanh_pca",
+        "MAE_mean": 0.4601754754781723
+      },
+      {
+        "gap": 50,
+        "arch": "tanh_raw",
+        "MAE_mean": 0.627067357301712
+      }
+    ]
+  },
+  "ecg": {
+    "overall_rank": [
+      "lsm_spikes",
+      "lsm_rates",
+      "softsign_raw",
+      "softsign_pca",
+      "tanh_pca",
+      "tanh_raw"
+    ],
+    "per_gap_best": [
+      {
+        "gap": 10,
+        "arch": "lsm_rates",
+        "MAE_mean": 0.9091697081606439
+      },
+      {
+        "gap": 20,
+        "arch": "lsm_spikes",
+        "MAE_mean": 0.5406513873566973
+      },
+      {
+        "gap": 50,
+        "arch": "softsign_raw",
+        "MAE_mean": 0.30071433040689916
+      }
+    ]
+  },
+  "combined_overall_rank": [
+    "lsm_spikes",
+    "softsign_pca",
+    "lsm_rates",
+    "tanh_pca",
+    "softsign_raw",
+    "tanh_raw"
+  ]
+}
