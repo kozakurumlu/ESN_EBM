@@ -1,0 +1,47 @@
+\begin{table}[t]
+\centering
+\caption{Paired Wilcoxon (Holm-corrected) among EBM variants.}
+\label{tab:sig_ebm_variants}
+\begin{tabular}{llllllll}
+\toprule
+dataset & gap & A & B & p_holm & dz & cliffs_delta & p_raw \\
+\midrule
+chirp & 10 & tanh_pca & tanh_raw & 0.003906 & -2.567 & -0.68 & 0.001953 \\
+chirp & 10 & softsign_raw & tanh_raw & 0.005859 & 6.178 & 0.16 & 0.001953 \\
+chirp & 10 & softsign_raw & tanh_pca & 0.007812 & 2.88 & 0.78 & 0.001953 \\
+chirp & 10 & softsign_pca & tanh_raw & 0.009766 & -2.825 & -0.68 & 0.001953 \\
+chirp & 10 & softsign_pca & softsign_raw & 0.01172 & -3.152 & -0.78 & 0.001953 \\
+chirp & 10 & softsign_pca & tanh_pca & 0.2324 & -0.5127 & -0.08 & 0.2324 \\
+chirp & 20 & tanh_pca & tanh_raw & 0.003906 & -2.389 & -0.54 & 0.001953 \\
+chirp & 20 & softsign_raw & tanh_raw & 0.005859 & 2.51 & 0.16 & 0.001953 \\
+chirp & 20 & softsign_raw & tanh_pca & 0.007812 & 2.518 & 0.56 & 0.001953 \\
+chirp & 20 & softsign_pca & tanh_raw & 0.009766 & -2.298 & -0.54 & 0.001953 \\
+chirp & 20 & softsign_pca & softsign_raw & 0.01172 & -2.416 & -0.6 & 0.001953 \\
+chirp & 20 & softsign_pca & tanh_pca & 0.9219 & 0.1883 & -0.02 & 0.9219 \\
+chirp & 50 & softsign_pca & tanh_pca & 0.9219 & -0.08144 & -0.02 & 0.9219 \\
+chirp & 50 & softsign_raw & tanh_raw & 0.9609 & 0.6039 & 0.06 & 0.1602 \\
+chirp & 50 & tanh_pca & tanh_raw & 0.9844 & 0.2572 & 0.18 & 0.4922 \\
+chirp & 50 & softsign_pca & softsign_raw & 1 & 0.2114 & 0.16 & 0.4922 \\
+chirp & 50 & softsign_pca & tanh_raw & 1 & 0.2565 & 0.18 & 0.4922 \\
+chirp & 50 & softsign_raw & tanh_pca & 1 & -0.2121 & -0.16 & 0.4922 \\
+ecg & 10 & softsign_raw & tanh_raw & 2.471e-23 & 0.8193 & 0.09316 & 4.118e-24 \\
+ecg & 10 & tanh_pca & tanh_raw & 2.492e-05 & 0.1193 & 0.1715 & 4.984e-06 \\
+ecg & 10 & softsign_pca & tanh_raw & 0.0006119 & 0.09327 & 0.14 & 0.000153 \\
+ecg & 10 & softsign_pca & tanh_pca & 0.004606 & -0.2304 & -0.03384 & 0.001535 \\
+ecg & 10 & softsign_raw & tanh_pca & 0.02973 & 0.02272 & -0.1057 & 0.01487 \\
+ecg & 10 & softsign_pca & softsign_raw & 0.2625 & -0.05511 & 0.07111 & 0.2625 \\
+ecg & 20 & softsign_raw & tanh_pca & 3.368e-28 & 0.9425 & 0.4042 & 5.613e-29 \\
+ecg & 20 & softsign_pca & softsign_raw & 3.519e-28 & -0.9508 & -0.4227 & 7.039e-29 \\
+ecg & 20 & softsign_pca & tanh_raw & 7.723e-22 & -0.7756 & -0.4049 & 1.931e-22 \\
+ecg & 20 & tanh_pca & tanh_raw & 3.269e-21 & -0.752 & -0.3815 & 1.09e-21 \\
+ecg & 20 & softsign_raw & tanh_raw & 0.0006597 & 0.3058 & 0.06843 & 0.0003299 \\
+ecg & 20 & softsign_pca & tanh_pca & 0.0007617 & -0.226 & -0.02472 & 0.0007617 \\
+ecg & 50 & softsign_pca & tanh_pca & 2.087e-32 & -0.8641 & -0.09577 & 3.479e-33 \\
+ecg & 50 & softsign_raw & tanh_raw & 0.0009125 & -0.2797 & -0.05572 & 0.0001825 \\
+ecg & 50 & softsign_raw & tanh_pca & 0.02804 & -0.2114 & -0.1255 & 0.007011 \\
+ecg & 50 & tanh_pca & tanh_raw & 0.06329 & 0.1765 & 0.06419 & 0.0211 \\
+ecg & 50 & softsign_pca & softsign_raw & 0.4969 & 0.06229 & 0.05235 & 0.2485 \\
+ecg & 50 & softsign_pca & tanh_raw & 0.845 & -0.001915 & -0.01606 & 0.845 \\
+\bottomrule
+\end{tabular}
+\end{table}

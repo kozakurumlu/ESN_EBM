@@ -1,0 +1,23 @@
+\begin{table}[t]
+\centering
+\caption{Best EBM (per dataset×gap) vs baselines (paired Wilcoxon, Holm-corrected).}
+\label{tab:sig_best_vs_baselines}
+\begin{tabular}{lllllllllll}
+\toprule
+dataset & gap & arch & baseline & N & MAE_EBM_mean & MAE_base_mean & p_holm & dz & cliffs_delta & p_raw \\
+\midrule
+chirp & 10 & softsign_pca & AR(2) & 10 & 0.4362 & 0.0542 & 0.003906 & 4.153 & 1 & 0.001953 \\
+chirp & 10 & softsign_pca & Linear & 10 & 0.4362 & 0.7445 & 0.001953 & -11.75 & -0.98 & 0.001953 \\
+chirp & 20 & tanh_pca & AR(2) & 10 & 0.46 & 0.2583 & 0.003906 & 1.478 & 0.66 & 0.001953 \\
+chirp & 20 & tanh_pca & Linear & 10 & 0.46 & 0.8024 & 0.001953 & -3.346 & -0.94 & 0.001953 \\
+chirp & 50 & tanh_raw & AR(2) & 10 & 0.6264 & 0.5341 & 0.003906 & 0.6235 & 0.42 & 0.003906 \\
+chirp & 50 & tanh_raw & Linear & 10 & 0.6264 & 0.7787 & 0.003906 & -1.957 & -0.76 & 0.001953 \\
+ecg & 10 & tanh_raw & AR(2) & 235 & 0.9436 & 0.9589 & 0.000635 & -0.2996 & -0.1314 & 0.000635 \\
+ecg & 10 & tanh_raw & Linear & 235 & 0.9436 & 0.9815 & 4.82e-21 & -0.6841 & -0.3861 & 2.41e-21 \\
+ecg & 20 & softsign_pca & AR(2) & 235 & 0.5617 & 0.6044 & 2.314e-18 & -0.5985 & -0.522 & 2.314e-18 \\
+ecg & 20 & softsign_pca & Linear & 235 & 0.5617 & 0.5036 & 4.262e-25 & 0.8222 & 0.6273 & 2.131e-25 \\
+ecg & 50 & softsign_raw & AR(2) & 235 & 0.3198 & 0.3153 & 0.356 & 0.05804 & -0.1573 & 0.356 \\
+ecg & 50 & softsign_raw & Linear & 235 & 0.3198 & 0.2536 & 7.883e-28 & 0.8365 & 0.5993 & 3.942e-28 \\
+\bottomrule
+\end{tabular}
+\end{table}
