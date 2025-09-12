@@ -1,0 +1,132 @@
+{
+  "chirp": {
+    "10": {
+      "tanh_raw": [
+        "softsign_raw"
+      ],
+      "lsm_spikes": [
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "softsign_pca": [
+        "lsm_spikes",
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "tanh_pca": [
+        "lsm_spikes",
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "lsm_rates": [
+        "softsign_raw",
+        "tanh_raw"
+      ]
+    },
+    "20": {
+      "tanh_raw": [
+        "softsign_raw"
+      ],
+      "lsm_spikes": [
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "softsign_pca": [
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "tanh_pca": [
+        "lsm_rates",
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "lsm_rates": [
+        "softsign_raw",
+        "tanh_raw"
+      ]
+    },
+    "50": {
+      "tanh_raw": [
+        "softsign_raw"
+      ]
+    }
+  },
+  "ecg": {
+    "10": {
+      "lsm_rates": [
+        "lsm_spikes",
+        "softsign_pca",
+        "softsign_raw",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "lsm_spikes": [
+        "softsign_pca",
+        "softsign_raw",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "softsign_pca": [
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "softsign_raw": [
+        "softsign_pca",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "tanh_raw": [
+        "tanh_pca"
+      ]
+    },
+    "20": {
+      "softsign_raw": [
+        "tanh_raw"
+      ],
+      "lsm_spikes": [
+        "lsm_rates",
+        "softsign_pca",
+        "softsign_raw",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "tanh_pca": [
+        "softsign_pca",
+        "softsign_raw",
+        "tanh_raw"
+      ],
+      "lsm_rates": [
+        "softsign_pca",
+        "softsign_raw",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "softsign_pca": [
+        "softsign_raw",
+        "tanh_raw"
+      ]
+    },
+    "50": {
+      "softsign_raw": [
+        "lsm_spikes",
+        "softsign_pca",
+        "tanh_pca",
+        "tanh_raw"
+      ],
+      "lsm_spikes": [
+        "softsign_pca",
+        "tanh_pca"
+      ],
+      "softsign_pca": [
+        "tanh_pca"
+      ],
+      "lsm_rates": [
+        "softsign_pca",
+        "tanh_pca"
+      ],
+      "tanh_raw": [
+        "tanh_pca"
+      ]
+    }
+  }
+}

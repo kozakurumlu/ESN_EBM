@@ -1,5 +1,5 @@
 # =================================== ESN+EBM with spike-centered ECG + OVERLAY PLOTS (LOCAL) ==========================
-# - No Google Drive/Colab. Saves everything under ./results/<timestamp>/
+# - Saves everything under ./results/<timestamp>/
 # - Robust WFDB loader for NumPy 2.x (no streaming; local cache) + compatibility shim
 # - Generates overlay figures with uncertainty band; saves per-window CSVs, summary and significance tables
 # ======================================================================================================================
