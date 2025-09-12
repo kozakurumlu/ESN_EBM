@@ -32,6 +32,12 @@ SEED_GLOBAL              = 1337
 
 # ------------------- Robust imports/installs -------------------
 import sys, subprocess, os, math, json, random, datetime
+# plotting + smoothing helpers (add to your existing imports)
+from scipy.signal import savgol_filter                      # NEW
+from mpl_toolkits.mplot3d.art3d import Line3DCollection     # NEW
+import matplotlib.cm as cm                                   # NEW
+import matplotlib.colors as mcolors                          # NEW
+
 
 def _pip(*args): subprocess.run([sys.executable, "-m", "pip", "install", "-q", *args], check=True)
 
@@ -815,30 +821,157 @@ class ArchSpec: name:str; kind:str; esn:ESNSpec=None; lsm:LSMSpec=None; feature_
 # ------------------- Overlay plotting & activity visuals -------------------
 def _std_alpha_blend(yf: np.ndarray, yb: np.ndarray):
     return (np.sqrt(1.0/12.0) * np.abs(yb - yf)).astype(np.float32)
+    
+def _choose_savgol_window(T: int, frac: float = 0.08, min_w: int = 7, max_w: int = 101) -> int:
+    """
+    Pick an odd Savitzky–Golay window length relative to sequence length T.
+    Defaults to ~8% of T, with [7, 101] clamp. Ensures < T and odd.
+    """
+    if T < 3: 
+        return 3
+    w = int(max(min_w, min(max_w, frac * T)))
+    if w % 2 == 0:
+        w += 1
+    if w >= T:
+        w = T - 1 if (T - 1) % 2 == 1 else T - 2
+    return max(3, w)
 
-def plot_activity_panels(activity: np.ndarray, dataset:str, arch:str, gap_len:int, win_id:int, kind:str):
+
+def _plot_reservoir_traces(activity: np.ndarray, dataset: str, arch: str, gap_len: int, win_id: int,
+                           kind: str, n_traces: int = 12, smooth: bool = True, normalize_unit: bool = True) -> None:
     """
-    activity: (T,N) numpy
+    'Simple' reservoir activity view (like your reference) — select the top-variance neurons,
+    optionally smooth each trace, and (optionally) scale each to ±1 so curves overlay cleanly.
     """
-    T,N = activity.shape
-    # Heatmap
-    fig, ax = plt.subplots(figsize=(8,4))
-    im = ax.imshow(activity.T, aspect='auto', origin='lower', interpolation='nearest')
-    ax.set_xlabel("t"); ax.set_ylabel("neuron"); ax.set_title(f"{dataset} | {arch} | {kind} activity | gap={gap_len} | win={win_id}")
-    fig.colorbar(im, ax=ax, shrink=0.8)
-    savefig(fig, f"{dataset}_{arch}_{kind}_activity_gap{gap_len}_win{win_id:04d}.png")
-    # PCA 3D
+    T, N = activity.shape
+    if T == 0 or N == 0:
+        return
+
+    # choose neurons with highest variance so the plot is informative
+    var = np.var(activity, axis=0)
+    keep = np.argsort(-var)[:min(n_traces, N)]
+    traces = activity[:, keep].copy()
+
+    # optional temporal smoothing to reduce jaggedness
+    if smooth and T >= 7:
+        w = _choose_savgol_window(T, frac=0.05)
+        for j in range(traces.shape[1]):
+            traces[:, j] = savgol_filter(traces[:, j], window_length=w, polyorder=3, mode="interp")
+
+    # normalize each trace to unit max|abs| so they live in roughly [-1, 1]
+    if normalize_unit:
+        denom = np.max(np.abs(traces), axis=0, keepdims=True) + 1e-6
+        traces = traces / denom
+
+    # draw
+    fig, ax = plt.subplots(figsize=(10, 2.6))
+    t = np.arange(T)
+    for j in range(traces.shape[1]):
+        ax.plot(t, traces[:, j], linewidth=1.4, alpha=0.95)
+
+    ax.set_xlim(0, T - 1)
+    ax.set_ylim(-1.15, 1.15)
+    ax.set_xlabel("timestep")
+    ax.set_ylabel("Neuron state")
+    ax.set_title("Reservoir Activity – Simple")
+    ax.grid(True, alpha=0.25, linestyle="--")
+    savefig(fig, f"{dataset}_{arch}_{kind}_activity_traces_gap{gap_len}_win{win_id:04d}.png")
+
+
+def _plot_pca3d_timecolor(activity: np.ndarray, dataset: str, arch: str, gap_len: int, win_id: int,
+                          kind: str, smooth: bool = True) -> None:
+    """
+    PCA trajectory in 3D with color encoding for time (direction-of-travel).
+    Uses Savitzky–Golay smoothing for a cleaner path.
+    """
+    T, _ = activity.shape
+    if T < 2:
+        return
+
+    # center and reduce to 3 PCs
+    X = activity - activity.mean(0, keepdims=True)
+    pcs = PCA(n_components=3).fit_transform(X)  # (T, 3)
+
+    # optional trajectory smoothing
+    if smooth and T >= 7:
+        w = _choose_savgol_window(T, frac=0.08)
+        pcs = np.vstack([savgol_filter(pcs[:, i], window_length=w, polyorder=3, mode="interp")
+                         for i in range(3)]).T
+
+    # build 3D colored line (segment-by-segment so color varies with time)
+    points = pcs.reshape(-1, 1, 3)
+    if T > 1:
+        segs = np.concatenate([points[:-1], points[1:]], axis=1)  # (T-1, 2, 3)
+    else:
+        segs = points
+
+    # color map over time
+    t_norm = np.linspace(0.0, 1.0, max(2, T - 1))
+    cmap = cm.get_cmap("viridis")
+    colors = cmap(t_norm)
+
+    fig = plt.figure(figsize=(6.6, 5.2))
+    ax = fig.add_subplot(111, projection="3d")
+
+    lc = Line3DCollection(segs, colors=colors, linewidths=2.0)
+    ax.add_collection3d(lc)
+
+    # start/end markers help orientation
+    ax.scatter(pcs[0, 0], pcs[0, 1], pcs[0, 2], marker="o", s=36, label="start")
+    ax.scatter(pcs[-1, 0], pcs[-1, 1], pcs[-1, 2], marker="^", s=42, label="end")
+
+    # tidy axes
+    for dim, setter in enumerate([ax.set_xlim, ax.set_ylim, ax.set_zlim]):
+        mn, mx = float(np.min(pcs[:, dim])), float(np.max(pcs[:, dim]))
+        pad = (mx - mn) * 0.10 + 1e-6
+        setter(mn - pad, mx + pad)
+
+    # time colorbar
+    sm = cm.ScalarMappable(cmap=cmap, norm=mcolors.Normalize(vmin=0, vmax=T - 1))
+    sm.set_array([])
+    cbar = fig.colorbar(sm, ax=ax, pad=0.02, shrink=0.8)
+    cbar.set_label("timestep")
+
+    ax.set_xlabel("PC1"); ax.set_ylabel("PC2"); ax.set_zlabel("PC3")
+    ax.set_title(f"{dataset} | {arch} | {kind} PCA (3D, time‑coded) | gap={gap_len} | win={win_id}")
+    ax.legend(loc="best", frameon=True)
+    savefig(fig, f"{dataset}_{arch}_{kind}_pca3d_timecolor_gap{gap_len}_win{win_id:04d}.png")
+
+
+def plot_activity_panels(activity: np.ndarray, dataset: str, arch: str, gap_len: int, win_id: int, kind: str):
+    """
+    activity: (T, N) numpy array of reservoir-only signals (ESN states or LSM spikes/rates)
+    Produces three figures:
+      (a) 'Simple' traces (top-variance neurons, normalized)  --> *_activity_traces_*.png
+      (b) Time‑colored 3D PCA trajectory (direction encoded)  --> *_pca3d_timecolor_*.png
+      (c) Heatmap for completeness (renamed)                  --> *_activity_heatmap_*.png
+    """
+    T, N = activity.shape
+
+    # (a) reservoir traces (like your example figure)
     try:
-        X = activity - activity.mean(0, keepdims=True)
-        pcs = PCA(n_components=3).fit_transform(X)
-        fig = plt.figure(figsize=(6,5))
-        ax = fig.add_subplot(111, projection='3d')
-        ax.plot(pcs[:,0], pcs[:,1], pcs[:,2])
-        ax.set_xlabel('PC1'); ax.set_ylabel('PC2'); ax.set_zlabel('PC3')
-        ax.set_title(f"{dataset} | {arch} | {kind} PCA (3D) | gap={gap_len} | win={win_id}")
-        savefig(fig, f"{dataset}_{arch}_{kind}_pca3d_gap{gap_len}_win{win_id:04d}.png")
-    except Exception:
-        pass
+        _plot_reservoir_traces(activity, dataset, arch, gap_len, win_id, kind,
+                               n_traces=12, smooth=True, normalize_unit=True)
+    except Exception as e:
+        print(f"[warn] traces plot failed: {e}")
+
+    # (b) time‑colored 3D PCA trajectory (smoother, direction visible)
+    try:
+        _plot_pca3d_timecolor(activity, dataset, arch, gap_len, win_id, kind, smooth=True)
+    except Exception as e:
+        print(f"[warn] PCA time‑coded plot failed: {e}")
+
+    # (c) keep a heatmap version (renamed to avoid clobbering)
+    try:
+        fig, ax = plt.subplots(figsize=(8, 4))
+        im = ax.imshow(activity.T, aspect='auto', origin='lower', interpolation='nearest')
+        ax.set_xlabel("t"); ax.set_ylabel("neuron")
+        ax.set_title(f"{dataset} | {arch} | {kind} activity | gap={gap_len} | win={win_id}")
+        fig.colorbar(im, ax=ax, shrink=0.8)
+        savefig(fig, f"{dataset}_{arch}_{kind}_activity_heatmap_gap{gap_len}_win{win_id:04d}.png")
+    except Exception as e:
+        print(f"[warn] heatmap plot failed: {e}")
+
 
 def plot_overlay(y_true:np.ndarray, y_lin:np.ndarray, y_ar2:np.ndarray, y_ebm:np.ndarray,
                  mask:np.ndarray, dataset:str, arch:str, gap_len:int, win_id:int,
